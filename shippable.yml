@@ -45,3 +45,76 @@ integrations:
   hub:
     - integrationName: dr-dockerhub
       type: dockerRegistryLogin
+
+
+resources:
+  - name: demo-img
+    type: image
+    integration: dr-dockerhub
+    pointer:
+      sourceName: "devopsrecipes/release-push-docker-hub"
+      isPull: false
+    seed:
+      versionName: master.2
+    flags:
+      - release-single-component
+
+  - name: demo-img-opts
+    type: dockerOptions
+    version:
+      memory: 128
+      cpuShares: 256
+      portMappings:
+        - 80:80
+      publishAllPorts : true
+    flags:
+      - release-single-component
+
+  - name: env-aws-ecs-cluster
+    type: cluster
+    integration: dr-aws
+    pointer:
+      sourceName : "release-push-docker-hub-ecs"
+      region: "us-west-2"
+    flags:
+      - release-single-component
+
+  - name: demo-release-version
+    type: version
+    seed:
+      versionName: "1.0.0"
+    flags:
+      - release-single-component
+
+
+jobs:
+
+  - name: release-single-component_runCI
+    type: runCI
+    steps:
+      - OUT: demo-img
+
+  - name: demo-man
+    type: manifest
+    steps:
+      - IN: demo-img
+      - IN: demo-img-opts
+    flags:
+      - release-single-component
+
+  - name: deploy-test-ecs
+    type: deploy
+    steps:
+      - IN: demo-man
+      - IN: env-aws-ecs-cluster
+    flags:
+      - release-single-component
+
+  - name: version-deployment
+    type: release
+    bump: beta
+    steps:
+      - IN: demo-release-version
+      - IN: deploy-test-ecs
+    flags:
+      - release-single-component
