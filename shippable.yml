@@ -50,7 +50,7 @@ integrations:
 resources:
   - name: demo-img
     type: image
-    integration: dr-dockerhub
+    integration: drship_dockerhub
     pointer:
       sourceName: "devopsrecipes/release-push-docker-hub"
       isPull: false
