@@ -43,14 +43,14 @@ integrations:
   # adding docker hub integration so that credentials are available to CI Job
   # http://docs.shippable.com/platform/integration/dockerRegistryLogin/
   hub:
-    - integrationName: dr-dockerhub
+    - integrationName: drship_dockerhub
       type: dockerRegistryLogin
 
 
 resources:
   - name: demo-img
     type: image
-    integration: dr-dockerhub
+    integration: drship_dockerhub
     pointer:
       sourceName: "devopsrecipes/release-push-docker-hub"
       isPull: false
